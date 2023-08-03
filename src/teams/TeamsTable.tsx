@@ -1,3 +1,6 @@
+import React from "react";
+import { loadTeamsRequest } from "./middleware";
+
 function TeamRow({ id, promotion, members, name, url }: Team) {
   const displayUrl = url.startsWith("https://github.com/") ? url.substring(19) : url;
   return (
@@ -105,17 +108,39 @@ export function TeamsTable(props: Props) {
   );
 }
 
-export function TeamsTableWrapper() {
-  const teams = [];
-  return (
-    <>
-      {/* <TeamsTable loading={true} teams={[]} />
-      <br />
-      <TeamsTable loading={false} teams={[]} />
-      <br />
-      <TeamsTable loading={true} teams={teams} />
-      <br /> */}
-      <TeamsTable loading={false} teams={teams} />
-    </>
-  );
+type WrapperProps = {};
+type State = {
+  loading: boolean;
+};
+
+export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
+  constructor(props) {
+    console.warn("wrapper", props);
+    super(props);
+    this.state = {
+      loading: false
+    };
+  }
+
+  componentDidMount(): void {
+    loadTeamsRequest().then(t => {
+      console.info("loaded", t);
+      this.setState({
+        loading: false
+      });
+    });
+  }
+  render() {
+    let teams = [];
+
+    //   loadTeamsRequest().then(t => {
+    //     console.info("loaded", t);
+    //     teams = t;
+    //   });
+
+    loadTeamsRequest();
+
+    console.warn("returned");
+    return <TeamsTable loading={this.state.loading} teams={teams} />;
+  }
 }
