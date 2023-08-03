@@ -25,8 +25,10 @@ function TeamRow({ id, promotion, members, name, url }) {
   );
 }
 
-export function TeamsTable(props) {
-  // console.warn(props);
+type Props = { loading: boolean; teams: any[] };
+
+export function TeamsTable(props: Props) {
+  console.warn("TeamTable", props);
   return (
     <form id="teamsForm" action="" method="get" className={props.loading ? "loading-mask" : ""}>
       <table id="teamsTable">
@@ -93,29 +95,7 @@ export function TeamsTable(props) {
 }
 
 export function TeamsTableWrapper() {
-  const teams = [
-    {
-      id: 1,
-      promotion: "FastTrackIT",
-      members: "Andrei Muntean",
-      name: "Teams Networking",
-      url: "https://github.com/andreimuntean21/teams-networking"
-    },
-    {
-      id: 2,
-      promotion: "Transilvania 03",
-      members: "Andrei Muntean",
-      name: "trei",
-      url: "https://github.com/andreimuntean21/teams-networking"
-    },
-    {
-      id: 2,
-      promotion: "Transilvania 03 - 2",
-      members: "Andrei Muntean",
-      name: "trei",
-      url: "https://github.com/andreimuntean21/teams-networking"
-    }
-  ];
+  const teams = [];
   return (
     <>
       {/* <TeamsTable loading={true} teams={[]} />
