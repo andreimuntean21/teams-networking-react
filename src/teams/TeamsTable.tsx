@@ -27,29 +27,6 @@ function TeamRow({ id, promotion, members, name, url }) {
 
 export function TeamsTable(props) {
   // console.warn(props);
-  const teams = [
-    {
-      id: 1,
-      promotion: "FastTrackIT",
-      members: "Andrei Muntean",
-      name: "Teams Networking",
-      url: "https://github.com/andreimuntean21/teams-networking"
-    },
-    {
-      id: 2,
-      promotion: "Transilvania 03",
-      members: "Andrei Muntean",
-      name: "trei",
-      url: "https://github.com/andreimuntean21/teams-networking"
-    },
-    {
-      id: 2,
-      promotion: "Transilvania 03 - 2",
-      members: "Andrei Muntean",
-      name: "trei",
-      url: "https://github.com/andreimuntean21/teams-networking"
-    }
-  ];
   return (
     <form id="teamsForm" action="" method="get" className={props.loading ? "loading-mask" : ""}>
       <table id="teamsTable">
@@ -74,7 +51,7 @@ export function TeamsTable(props) {
           </tr>
         </thead>
         <tbody>
-          {teams.map(team => (
+          {props.teams.map(team => (
             <TeamRow
               key={team.id}
               id={team.id}
@@ -116,5 +93,38 @@ export function TeamsTable(props) {
 }
 
 export function TeamsTableWrapper() {
-  return <TeamsTable loading={false} />;
+  const teams = [
+    {
+      id: 1,
+      promotion: "FastTrackIT",
+      members: "Andrei Muntean",
+      name: "Teams Networking",
+      url: "https://github.com/andreimuntean21/teams-networking"
+    },
+    {
+      id: 2,
+      promotion: "Transilvania 03",
+      members: "Andrei Muntean",
+      name: "trei",
+      url: "https://github.com/andreimuntean21/teams-networking"
+    },
+    {
+      id: 2,
+      promotion: "Transilvania 03 - 2",
+      members: "Andrei Muntean",
+      name: "trei",
+      url: "https://github.com/andreimuntean21/teams-networking"
+    }
+  ];
+  return (
+    <>
+      {/* <TeamsTable loading={true} teams={[]} />
+      <br />
+      <TeamsTable loading={false} teams={[]} />
+      <br />
+      <TeamsTable loading={true} teams={teams} />
+      <br /> */}
+      <TeamsTable loading={false} teams={teams} />
+    </>
+  );
 }
