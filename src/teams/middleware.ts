@@ -1,4 +1,4 @@
-export function deleteTeamRequest(id, callback) {
+export function deleteTeamRequest(id: string, callback?: (status: any) => void) {
   return fetch("http://localhost:3000/teams-json/delete", {
     method: "DELETE",
     headers: {
