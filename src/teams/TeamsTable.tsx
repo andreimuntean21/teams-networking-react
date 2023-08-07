@@ -6,7 +6,7 @@ function TeamRow({ id, promotion, members, name, url }: Team) {
   return (
     <tr>
       <td style={{ textAlign: "center" }}>
-        <input type="checkbox" name="selected" value="${id}" />
+        <input type="checkbox" name="selected" value={id} />
       </td>
       <td>{promotion}</td>
       <td>{members}</td>
@@ -17,10 +17,10 @@ function TeamRow({ id, promotion, members, name, url }: Team) {
         </a>
       </td>
       <td>
-        <button type="button" data-id={id} className="action-btn edit-btn">
+        <button type="button" className="action-btn edit-btn">
           &#9998;
         </button>
-        <button type="button" data-id={id} className="action-btn remove-btn">
+        <button type="button" className="action-btn remove-btn">
           ♻
         </button>
       </td>
@@ -111,6 +111,7 @@ export function TeamsTable(props: Props) {
 type WrapperProps = {};
 type State = {
   loading: boolean;
+  teams: Team[];
 };
 
 export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
@@ -118,29 +119,22 @@ export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
     console.warn("wrapper", props);
     super(props);
     this.state = {
-      loading: false
+      loading: false,
+      teams: []
     };
   }
 
   componentDidMount(): void {
-    loadTeamsRequest().then(t => {
-      console.info("loaded", t);
+    loadTeamsRequest().then(teams => {
+      console.info("loaded", teams);
       this.setState({
-        loading: false
+        loading: false,
+        teams
       });
     });
   }
   render() {
-    let teams = [];
-
-    //   loadTeamsRequest().then(t => {
-    //     console.info("loaded", t);
-    //     teams = t;
-    //   });
-
-    loadTeamsRequest();
-
-    console.warn("returned");
-    return <TeamsTable loading={this.state.loading} teams={teams} />;
+    console.info("render");
+    return <TeamsTable loading={this.state.loading} teams={this.state.teams} />;
   }
 }
