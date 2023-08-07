@@ -1,3 +1,12 @@
+export function loadTeamsRequest() {
+  return fetch("http://localhost:3000/teams-json", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }).then(r => r.json());
+}
+
 export function deleteTeamRequest(id: string, callback?: (status: any) => void) {
   return fetch("http://localhost:3000/teams-json/delete", {
     method: "DELETE",
@@ -32,14 +41,5 @@ export function createTeamRequest(team) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(team)
-  }).then(r => r.json());
-}
-
-export function loadTeamsRequest() {
-  return fetch("http://localhost:3000/teams-json", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    }
   }).then(r => r.json());
 }

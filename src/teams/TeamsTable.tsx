@@ -9,11 +9,6 @@ type Team = {
   url: string;
 };
 
-type Props = {
-  loading: boolean;
-  teams: any[];
-};
-
 type RowProps = {
   team: Team;
   deleteTeam(id: string): void;
@@ -31,7 +26,7 @@ function TeamRow(props: RowProps) {
       <td>{members}</td>
       <td>{name}</td>
       <td>
-        <a href={url} target="_blank">
+        <a href={url} target="_blank" rel="noreferrer">
           {displayUrl}
         </a>
       </td>
@@ -53,8 +48,13 @@ function TeamRow(props: RowProps) {
   );
 }
 
+type Props = {
+  loading: boolean;
+  teams: Team[];
+  deleteTeam(id: string): void;
+};
+
 export function TeamsTable(props: Props) {
-  console.warn("TeamTable", props);
   return (
     <form id="teamsForm" action="" method="get" className={props.loading ? "loading-mask" : ""}>
       <table id="teamsTable">
@@ -84,8 +84,7 @@ export function TeamsTable(props: Props) {
               key={team.id}
               team={team}
               deleteTeam={function (id) {
-                console.warn("pls remove %o team", id);
-                deleteTeamRequest(id);
+                props.deleteTeam(id);
               }}
             />
           ))}
@@ -100,10 +99,10 @@ export function TeamsTable(props: Props) {
               <input type="text" name="members" placeholder="Enter members" required />
             </td>
             <td>
-              <input type="text" name="name" placeholder="Enter project name" required />
+              <input type="text" name="name" placeholder="Enter name" required />
             </td>
             <td>
-              <input type="text" name="url" placeholder="project URL" required />
+              <input type="text" name="url" placeholder="Enter url" required />
             </td>
             <td>
               <button type="submit" className="action-btn" title="Add">
@@ -128,15 +127,18 @@ type State = {
 
 export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
   constructor(props) {
-    console.warn("wrapper", props);
     super(props);
     this.state = {
-      loading: false,
+      loading: true,
       teams: []
     };
   }
 
   componentDidMount(): void {
+    this.loadTeams();
+  }
+
+  loadTeams() {
     loadTeamsRequest().then(teams => {
       console.info("loaded", teams);
       this.setState({
@@ -145,8 +147,21 @@ export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
       });
     });
   }
+
   render() {
     console.info("render");
-    return <TeamsTable loading={this.state.loading} teams={this.state.teams} />;
+    return (
+      <TeamsTable
+        loading={this.state.loading}
+        teams={this.state.teams}
+        deleteTeam={async id => {
+          this.setState({ loading: true });
+          const status = await deleteTeamRequest(id);
+          if (status.success) {
+            this.loadTeams();
+          }
+        }}
+      />
+    );
   }
 }
