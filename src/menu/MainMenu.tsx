@@ -1,31 +1,41 @@
+import { useState } from "react";
 import "./menu.css";
 
 export function MainMenu() {
+  const [active, setActive] = useState("home");
   return (
     <ul id="top-menu-bar">
       <li>
-        <a href="#home" data-page="home">
+        <a
+          href="#home"
+          className={active === "home" ? "active" : ""}
+          onClick={() => {
+            setActive("home");
+          }}
+        >
           Home
         </a>
       </li>
       <li>
-        <a href="#skills" data-page="skills">
-          Skills
+        <a
+          href="#todos"
+          className={active === "todos" ? "active" : ""}
+          onClick={() => {
+            setActive("todos");
+          }}
+        >
+          To Do's
         </a>
       </li>
       <li>
-        <a href="#projects" data-page="projects">
+        <a
+          href="#teams"
+          className={active === "teams" ? "active" : ""}
+          onClick={() => {
+            setActive("teams");
+          }}
+        >
           Projects
-        </a>
-      </li>
-      <li>
-        <a href="#languages" data-page="languages">
-          Languages
-        </a>
-      </li>
-      <li>
-        <a href="#rubik" data-page="rubik">
-          💠Rubik's
         </a>
       </li>
     </ul>
