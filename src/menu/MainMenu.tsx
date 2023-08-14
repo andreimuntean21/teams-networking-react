@@ -5,41 +5,28 @@ type Page = "home" | "todos" | "teams";
 
 export function MainMenu() {
   const [active, setActive] = useState<Page>("home");
+
+  const elements = [
+    { text: "Home", name: "home" },
+    { text: "To Do's", name: "todos" },
+    { text: "Teams", name: "teams" }
+  ];
+
   return (
     <ul id="top-menu-bar">
-      <li>
-        <a
-          href="#home"
-          className={active === "home" ? "active" : ""}
-          onClick={() => {
-            setActive("home");
-          }}
-        >
-          Home
-        </a>
-      </li>
-      <li>
-        <a
-          href="#todos"
-          className={active === "todos" ? "active" : ""}
-          onClick={() => {
-            setActive("todos");
-          }}
-        >
-          To Do's
-        </a>
-      </li>
-      <li>
-        <a
-          href="#teams"
-          className={active === "teams" ? "active" : ""}
-          onClick={() => {
-            setActive("teams");
-          }}
-        >
-          Projects
-        </a>
-      </li>
+      {elements.map(element => (
+        <li>
+          <a
+            href={"#" + element.name}
+            className={active === element.name ? "active" : ""}
+            onClick={() => {
+              setActive(element.name as Page); //tmp use 'as Page'
+            }}
+          >
+            {element.text}
+          </a>
+        </li>
+      ))}
     </ul>
   );
 }
