@@ -1,12 +1,10 @@
 import React from "react";
-import { deleteTeamRequest, loadTeamsRequest, updateTeamRequest } from "./middleware";
+import { createTeamRequest, deleteTeamRequest, loadTeamsRequest, updateTeamRequest } from "./middleware";
 import { Team } from "./models";
 
 type RowProps = {
   team: Team;
-  deleteTeam(id: string): void;
 };
-
 type RowActions = {
   deleteTeam(id: string): void;
   startEdit(team: Team): void;
@@ -144,7 +142,6 @@ type Actions = {
 export function TeamsTable(props: Props & Actions) {
   return (
     <form
-      id="teamsForm"
       action=""
       method="get"
       className={props.loading ? "loading-mask" : ""}
@@ -198,16 +195,56 @@ export function TeamsTable(props: Props & Actions) {
           <tr>
             <td></td>
             <td>
-              <input type="text" name="promotion" placeholder="Enter promotion" required disabled={!!props.team.id} />
+              <input
+                type="text"
+                name="promotion"
+                placeholder="Enter promotion"
+                required
+                value={props.team.id ? "" : props.team.promotion}
+                disabled={!!props.team.id}
+                onChange={e => {
+                  props.inputChange("promotion", e.target.value);
+                }}
+              />
             </td>
             <td>
-              <input type="text" name="members" placeholder="Enter members" required disabled={!!props.team.id} />
+              <input
+                type="text"
+                name="members"
+                placeholder="Enter members"
+                required
+                value={props.team.id ? "" : props.team.members}
+                disabled={!!props.team.id}
+                onChange={e => {
+                  props.inputChange("members", e.target.value);
+                }}
+              />
             </td>
             <td>
-              <input type="text" name="name" placeholder="Enter name" required disabled={!!props.team.id} />
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter name"
+                required
+                value={props.team.id ? "" : props.team.name}
+                disabled={!!props.team.id}
+                onChange={e => {
+                  props.inputChange("name", e.target.value);
+                }}
+              />
             </td>
             <td>
-              <input type="text" name="url" placeholder="Enter url" required disabled={!!props.team.id} />
+              <input
+                type="text"
+                name="url"
+                placeholder="Enter url"
+                required
+                value={props.team.id ? "" : props.team.url}
+                disabled={!!props.team.id}
+                onChange={e => {
+                  props.inputChange("url", e.target.value);
+                }}
+              />
             </td>
             <td>
               <button type="submit" className="action-btn" title="Add" disabled={!!props.team.id}>
@@ -224,7 +261,9 @@ export function TeamsTable(props: Props & Actions) {
   );
 }
 
-type WrapperProps = {};
+type WrapperProps = {
+  search: string;
+};
 type State = {
   loading: boolean;
   teams: Team[];
@@ -255,7 +294,7 @@ export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
     this.loadTeams();
   }
 
-  async loadTeams() {
+  private async loadTeams() {
     const teams = await loadTeamsRequest();
     console.info("loaded", teams);
     this.setState({
@@ -264,42 +303,67 @@ export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
     });
   }
 
+  async save() {
+    const team = this.state.team;
+    this.setState({ loading: true });
+    let done: boolean;
+    if (team.id) {
+      const { success } = await updateTeamRequest(team);
+      done = success;
+      await this.loadTeams();
+    } else {
+      const { id, success } = await createTeamRequest(team);
+      done = success;
+      this.setState(state => ({
+        teams: [...state.teams, { ...team, id }]
+      }));
+    }
+    if (done) {
+      this.setState({
+        loading: false,
+        team: getEmptyTeam()
+      });
+    }
+  }
+
+  async deleteTeam(id: string) {
+    this.setState({ loading: true });
+    const status = await deleteTeamRequest(id);
+    if (status.success) {
+      this.loadTeams();
+    }
+  }
+
+  inputChange(name: keyof Team, value: string) {
+    this.setState(state => ({
+      team: {
+        ...state.team,
+        [name]: value
+      }
+    }));
+  }
+
   render() {
-    console.info("render");
+    console.info("render %o", this.props.search);
+
+    const teams = filterElements(this.state.teams, this.props.search);
+
     return (
       <TeamsTable
         loading={this.state.loading}
-        teams={this.state.teams}
+        teams={teams}
         team={this.state.team}
-        deleteTeam={async id => {
-          this.setState({ loading: true });
-          const status = await deleteTeamRequest(id);
-          if (status.success) {
-            this.loadTeams();
-          }
+        deleteTeam={id => {
+          this.deleteTeam(id);
         }}
         startEdit={team => {
-          console.info("start edit", team);
           this.setState({ team });
         }}
         inputChange={(name, value) => {
-          console.info("input change %o", value);
-          this.setState(state => {
-            const team = { ...state.team };
-            team[name] = value;
-            return {
-              team
-            };
-          });
+          this.inputChange(name, value);
         }}
-        save={async () => {
-          console.warn("save", this.state.team);
-          this.setState({ loading: true });
-          const { success } = await updateTeamRequest(this.state.team);
-          if (success) {
-            await this.loadTeams();
-            this.setState({ team: getEmptyTeam() });
-          }
+        save={() => {
+          this.save();
         }}
         reset={() => {
           this.setState({ team: getEmptyTeam() });
@@ -307,4 +371,19 @@ export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
       />
     );
   }
+}
+
+// => T extends { [key: string]: string }
+function filterElements<T extends {}>(elements: T[], search: string) {
+  if (!search) {
+    return elements;
+  }
+  search = search.trim().toLowerCase();
+  return elements.filter(element => {
+    return Object.entries(element).some(([key, value]) => {
+      if (key !== "id") {
+        return typeof value === "string" ? value.toLowerCase().includes(search) : value === search;
+      }
+    });
+  });
 }
