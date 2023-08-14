@@ -13,9 +13,9 @@ export function MainMenu() {
   ];
 
   return (
-    <ul id="top-menu-bar">
+    <ul className="menu-bar">
       {elements.map(element => (
-        <li>
+        <li key={element.name}>
           <a
             href={"#" + element.name}
             className={active === element.name ? "active" : ""}
